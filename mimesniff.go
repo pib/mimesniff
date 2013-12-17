@@ -3,7 +3,6 @@ package mimesniff
 import (
 	"io"
 	"net/http"
-	"strings"
 )
 
 // Resource wraps a resource which can be fetched via some means. For
@@ -61,53 +60,7 @@ func (meta *ResourceMetadata) sniffType() {
 		meta.SniffedType = meta.SuppliedType
 		return
 	case parsedType.MediaType == "text/html":
-		meta.SniffedType = distinguishFeed(meta.res.Header())
+		meta.SniffedType = distinguishFeed(meta.SuppliedType, string(meta.res.Header()))
 		return
 	}
-}
-
-// implements http://mimesniff.spec.whatwg.org/#rules-for-distinguishing-if-a-resource-is-a-feed-or-html
-func distinguishFeed(suppliedType string, head string) string {
-	// Steps 1-3 not needed
-	// Step 4: Skip BOM
-	head = strings.TrimPrefix(head, "\xef\xbb\xbf")
-
-	// Step 5
-	for len(head) > 0 {
-		// Step 5.1: Skip whitespace and break after finding a "<"
-		head = strings.TrimSpace(head)
-		if !strings.HasPrefix(head, "<") {
-			return suppliedType // bail out if there's a non-"<" after the whitespace
-		}
-
-		// Step 5.2: Find first mentioned MIME type
-		for s < length { // 5.2.1
-			ss := sequence[s:]
-			switch {
-			case strings.HasPrefix(ss, "!--"): // 5.2.2: Skip comments
-				s += 3
-				for s < length { // 5.2.2.1
-					if strings.HasPrefix(sequence[s:], "-->") { // 5.2.2.2
-						s += 3
-						break
-					}
-					s++ // 5.2.2.3
-				}
-			case strings.HasPrefix(ss, "!"): // 5.2.3: Skip declarations
-				s++
-				for s < length { // 5.2.3.1
-					if strings.HasPrefix(sequence[s:], ">") { // 5.2.3.2
-						s++
-						break
-					}
-					s++ // 5.2.3.3
-				}
-			case strings.HasPrefix(ss, "?"): // 5.2.4: Skip processing instructions
-				s++
-				for s < length {
-				}
-			}
-		}
-	}
-	return suppliedType
 }
