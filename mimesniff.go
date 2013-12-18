@@ -1,8 +1,8 @@
 package mimesniff
 
 import (
+	"code.google.com/p/go.text/transform"
 	"io"
-	"net/http"
 )
 
 // Resource wraps a resource which can be fetched via some means. For
@@ -37,10 +37,11 @@ func NewResourceMetadata(res Resource) *ResourceMetadata {
 	return &meta
 }
 
+// http://mimesniff.spec.whatwg.org/#determining-the-sniffed-mime-type-of-a-resource
 func (meta *ResourceMetadata) sniffType() {
 	switch meta.SuppliedType {
 	case "", "unknown/unknown", "application/unknown", "*/*":
-		meta.SniffedType = http.DetectContentType(meta.res.Header())
+		meta.SniffedType = DetectContentType(meta.res.Header())
 		return
 	}
 
@@ -50,7 +51,7 @@ func (meta *ResourceMetadata) sniffType() {
 	}
 
 	if meta.res.ShouldSniffBinary(meta.SuppliedType) {
-		meta.SniffedType = http.DetectContentType(meta.res.Header())
+		meta.SniffedType = DetectContentType(meta.res.Header())
 		return
 	}
 
@@ -58,9 +59,18 @@ func (meta *ResourceMetadata) sniffType() {
 	switch {
 	case parsedType.IsXml():
 		meta.SniffedType = meta.SuppliedType
-		return
 	case parsedType.MediaType == "text/html":
 		meta.SniffedType = distinguishFeed(meta.SuppliedType, string(meta.res.Header()))
-		return
+	case parsedType.IsImage(), parsedType.IsAudioVideo():
+		if m := DetectContentType(meta.res.Header()); m != "application/octet-stream" {
+			meta.SniffedType = m
+		}
+	default:
+		meta.SniffedType = meta.SuppliedType
 	}
+}
+
+func (meta *ResourceMetadata) DecodeBody() io.Reader {
+	encoding := determineEncoding(meta.ParsedType, meta.res.Header())
+	return transform.NewReader(meta.res.Body(), charsetsEncoding[encoding].NewDecoder())
 }

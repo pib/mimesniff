@@ -31,3 +31,23 @@ func (pm *ParsedMimeType) IsXml() bool {
 		return false
 	}
 }
+
+func (pm *ParsedMimeType) IsImage() bool {
+	return pm.Type == "image"
+}
+
+func (pm *ParsedMimeType) IsAudioVideo() bool {
+	switch {
+	case pm.Type == "audio", pm.Type == "video", pm.MediaType == "application/ogg":
+		return true
+	}
+	return false
+}
+
+func (pm *ParsedMimeType) IsText() bool {
+	return pm.Type == "text"
+}
+
+func (pm *ParsedMimeType) IsHtml() bool {
+	return pm.MediaType == "text/html" || pm.MediaType == "application/xhtml+xml"
+}
