@@ -72,5 +72,5 @@ func (meta *ResourceMetadata) sniffType() {
 
 func (meta *ResourceMetadata) DecodeBody() io.Reader {
 	encoding := determineEncoding(meta.ParsedType, meta.res.Header())
-	return transform.NewReader(meta.res.Body(), charsetsEncoding[encoding].NewDecoder())
+	return transform.NewReader(meta.res.Body(), encoding.NewDecoder())
 }

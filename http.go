@@ -18,9 +18,9 @@ func NewHttpResponse(res *http.Response) *HttpResponse {
 }
 
 func (res *HttpResponse) Header() []byte {
-	head, err := res.bodyReader.Peek(512)
+	head, err := res.bodyReader.Peek(1024)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error reading 512 bytes of HttpResponse", err)
+		fmt.Fprintln(os.Stderr, "Error reading 1024 bytes of HttpResponse", err)
 		fmt.Fprintf(os.Stderr, "Continuing with the %d bytes read\n", len(head))
 	}
 	return head

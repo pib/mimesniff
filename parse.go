@@ -24,6 +24,10 @@ func ParseMimeType(mimeType string) *ParsedMimeType {
 	return &parsedType
 }
 
+func (pm *ParsedMimeType) String() string {
+	return mime.FormatMediaType(pm.MediaType, pm.Params)
+}
+
 func (pm *ParsedMimeType) IsXml() bool {
 	if pm.SubType == "xml" || strings.HasSuffix(pm.SubType, "+xml") {
 		return true
