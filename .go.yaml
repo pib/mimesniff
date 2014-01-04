@@ -1,0 +1,13 @@
+path: github.com/marketvibe/mimesniff
+deps:
+- loc: code.google.com/p/go.net/html
+- loc: code.google.com/p/go.net/html/atom
+- loc: code.google.com/p/go.net/html/charset
+- loc: code.google.com/p/go.text/encoding
+- loc: code.google.com/p/go.text/encoding/charmap
+- loc: code.google.com/p/go.text/encoding/japanese
+- loc: code.google.com/p/go.text/encoding/korean
+- loc: code.google.com/p/go.text/encoding/simplifiedchinese
+- loc: code.google.com/p/go.text/encoding/traditionalchinese
+- loc: code.google.com/p/go.text/encoding/unicode
+- loc: code.google.com/p/go.text/transform
