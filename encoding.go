@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func determineEncoding(givenType *ParsedMimeType, head []byte) encoding.Encoding {
+func DetermineEncoding(givenType *ParsedMimeType, head []byte) encoding.Encoding {
 	enc, _, certain := charset.DetermineEncoding(head, givenType.String())
 	if certain {
 		return enc
