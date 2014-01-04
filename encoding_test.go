@@ -2,31 +2,28 @@ package mimesniff
 
 import (
 	"code.google.com/p/go.text/encoding"
+	"code.google.com/p/go.text/encoding/charmap"
 	"testing"
 )
 
+type encodingTest struct {
+	mimeType         string
+	head             string
+	expectedEncoding encoding.Encoding
+}
+
+var encodingTests = []encodingTest{
+	{"text/html", `<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"></head></html>`, encoding.Nop},
+	{"text/html", `<?xml version="1.0" encoding="UTF-8"?>`, encoding.Nop},
+	{"text/xml", `<?xml version="1.0" encoding="iso8859-1"?>`, charmap.Windows1252},
+	{"text/xml", `⚂`, encoding.Nop},
+}
+
 func TestDetermineEncoding(t *testing.T) {
-	head := `
-
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-
-	<head>
-
-		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-
-		<title>
-			
-			⚃ Rolling Dice with JS and Unicode ⚂ | Probably Programming
-			
-		</title>`
-
-	mimeType := ParseMimeType("text/html")
-	if enc := DetermineEncoding(mimeType, []byte(head)); enc != encoding.Nop {
-		t.Error("Expected", encoding.Nop, "got", enc)
+	for _, test := range encodingTests {
+		mimeType := ParseMimeType(test.mimeType)
+		if enc := DetermineEncoding(mimeType, []byte(test.head)); enc != test.expectedEncoding {
+			t.Errorf("Expected %v got %v\n%v", test.expectedEncoding, enc, test)
+		}
 	}
 }
